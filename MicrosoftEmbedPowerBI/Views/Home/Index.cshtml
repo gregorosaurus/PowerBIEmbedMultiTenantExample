@@ -1,0 +1,61 @@
+﻿@{
+    MicrosoftEmbedPowerBI.Models.EmbedParams embedParams = ViewBag.EmbedParams;
+}
+
+<div style="height:100vh;width:100%;" id="reportContainer"></div>
+
+<input type="hidden" id="embedparamToken" value="@embedParams.EmbedToken!.Token"/>
+<input type="hidden" id="embedparamReportUrl" value="@embedParams.EmbedReport[0].EmbedUrl" />
+<input type="hidden" id="embedparamExpiry" value="@embedParams.EmbedToken!.Expiration" />
+
+<script type="text/javascript">
+    var models = window["powerbi-client"].models;
+    var embedToken = document.getElementById("embedparamToken").value;
+    var embedReportUrl = document.getElementById("embedparamReportUrl").value;
+    var reportContainer = document.getElementById("reportContainer");
+
+    reportLoadConfig = {
+        type: "report",
+        tokenType: models.TokenType.Embed,
+        accessToken: embedToken,
+        embedUrl: embedReportUrl,
+         settings: {
+             background: models.BackgroundType.Transparent
+         }
+    };
+
+    // Use the token expiry to regenerate Embed token for seamless end user experience
+    // Refer https://aka.ms/RefreshEmbedToken
+    tokenExpiry = embedparamExpiry;
+
+    // Embed Power BI report when Access token and Embed URL are available
+    var report = powerbi.embed(reportContainer, reportLoadConfig);
+
+    // Clear any other loaded handler events
+    report.off("loaded");
+
+    // Triggers when a report schema is successfully loaded
+    report.on("loaded", function () {
+        console.log("Report load successful");
+    });
+
+    // Clear any other rendered handler events
+    report.off("rendered");
+
+    // Triggers when a report is successfully embedded in UI
+    report.on("rendered", function () {
+        console.log("Report render successful");
+    });
+
+    // Clear any other error handler events
+    report.off("error");
+
+    // Handle embed errors
+    report.on("error", function (event) {
+        var errorMsg = event.detail;
+
+        // Use errorMsg variable to log error in any destination of choice
+        console.error(errorMsg);
+        return;
+    });
+</script>

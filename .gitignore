@@ -363,3 +363,4 @@ FodyWeavers.xsd
 /rpmbuild/SOURCES
 /ENG.WMOCodes/.DS_Store
 .DS_Store
+/MicrosoftEmbedPowerBI/appsettings.json
